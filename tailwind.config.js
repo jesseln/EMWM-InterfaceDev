@@ -1,17 +1,17 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: [],
-  theme: {
-    extend: {
-      colors: {
-        primary: '#270A4B',
-        secondary: '#E8C36D',
-        dark: '#110734'
-      },
-      fontFamily: {
-        sans: ['Raleway']
-      }
-    },
-  },
-  plugins: [],
-}
+// /** @type {import('tailwindcss').Config} */
+// module.exports = {
+//   content: [],
+//   theme: {
+//     extend: {
+//       colors: {
+//         primary: '#FFFFFF',
+//         secondary: '#E8C36D',
+//         dark: '#FFFFFF'
+//       },
+//       fontFamily: {
+//         sans: ['Raleway']
+//       }
+//     },
+//   },
+//   plugins: [],
+// }

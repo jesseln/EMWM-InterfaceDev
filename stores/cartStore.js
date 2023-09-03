@@ -1,51 +1,37 @@
 // import { defineStore } from 'pinia'
 
-export const useCartStore = defineStore('cart', {
-  state: () => ({
-    cart: []
-    
-  }),
-  getters: {
-    cartTotal() {
-      return this.cart.reduce((total, item) => {
+export const useCartStore = defineStore('cart', ()=>{
+  const supabase = useSupabaseClient()
+  const { getTable } = useDatabase();
+
+  const cart = ref([])
+  const cartTotal = computed(() => 
+      cart.value.reduce((total, item) => {
         return total + (item.BookID * item.quantity)
       }, 0)
-    },
-    numberOfItems() {
-      return this.cart.reduce((total, item) => {
+  )
+  const numberOfItems = computed(() => 
+      cart.value.reduce((total, item) => {
         return total + item.quantity
       }, 0)
+  )
+    async function getCart() {
+      cart.value = await getTable('Book','BookID')
     }
-  },
-  actions: {
-    //Supabase first set-up
-    async getCart() {
-      const supabase = useSupabaseClient();
-      const { data, error } = await supabase
-      .from('Book')
-      .select()
 
-      if(error) {
-        console.log(error)
-      }
-
-      if (data){
-        this.cart = data
-      }
-    },
-    async deleteFromCart(item) {
-      this.cart = this.cart.filter(i => {
+    async function deleteFromCart(item) {
+      cart.value = cart.value.filter(i => {
         return i.id !== item.id
       })
 
       await $fetch('http://localhost:4000/cart/' + item.id, {
         method: 'delete'
       })
-    },
+    }
     //This could be refactored. These functions are nearly identical
-    async incQuantity(item) {
+    async function incQuantity(item) {
       let updatedItem
-      this.cart = this.cart.map(i => {
+      cart.value = cart.value.map(i => {
         if (i.id === item.id) {
           i.quantity ++
           updatedItem = i
@@ -58,10 +44,10 @@ export const useCartStore = defineStore('cart', {
         method: 'put',
         body: JSON.stringify(updatedItem)
       })
-    },
-    async decQuantity(item) {
+    }
+    async function decQuantity(item) {
       let updatedItem
-      this.cart = this.cart.map(i => {
+      cart.value = cart.value.map(i => {
         if (i.id === item.id && i.quantity > 1) {
           i.quantity --
           updatedItem = i
@@ -75,20 +61,23 @@ export const useCartStore = defineStore('cart', {
         body: JSON.stringify(updatedItem)
       })
       }
-    },
-    async addToCart(item) {
-      const exists = this.cart.find(i => i.id === item.id) //I like this approach. Should probably be a function though.
+    }
+    async function addToCart(item) {
+      const exists = cart.value.find(i => i.id === item.id) //I like this approach. Should probably be a function though.
       if(exists) {
         this.incQuantity(item)
       }
 
       if(!exists) {
-        this.cart.push({...item, quantity: 1}) //This syntax is useful.  Note spread object, is then enclosed in an object.
+        cart.value.push({...item, quantity: 1}) //This syntax is useful.  Note spread object, is then enclosed in an object.
         await $fetch('http://localhost:4000/cart', { 
           method: 'post',
           body: JSON.stringify({...item, quantity: 1})
         })
       }
     }
-  }
+
+    return {cart, cartTotal, numberOfItems, getCart, 
+            deleteFromCart, incQuantity, decQuantity, 
+            addToCart}
 })

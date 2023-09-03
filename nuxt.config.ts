@@ -2,11 +2,15 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: [
-    '@nuxtjs/tailwindcss',
+    // '@nuxtjs/tailwindcss',
+    'nuxt-lodash',
     '@nuxt/image',
     '@pinia/nuxt',
     '@nuxt/devtools',
-    '@nuxtjs/supabase'
+    '@nuxtjs/supabase',
+    'floating-vue/nuxt',
+    '@nuxtjs/google-fonts',
+    '@vueuse/nuxt' // @vueuse/nuxt an add-on of VueUse, which provides better Nuxt integration auto-import capabilities.
   ],
   image: {
     presets: {
@@ -19,12 +23,23 @@ export default defineNuxtConfig({
       }
     }
   },
-  // css: [
-  //   // CSS file in the project
-  //   '@/assets/css/main.css',
-  //   // SCSS file in the project
-  //   '@/assets/css/main.scss'
-  // ],
+  googleFonts: {
+    families: {
+      // a name with spaces
+      Roboto: true,
+      'Source Sans 3': [100,200,300,400,500,600,700],
+      'Source Serif 4': [100,200,300,400,500,600,700],
+      Raleway: [100,200,300,400,500,600,700],
+      // specific font weights
+      // Lato: [100, 300],
+    }
+  },
+  css: [
+    // CSS file in the project
+    '@/assets/css/main.css',
+    // SCSS file in the project
+    '@/assets/css/main.scss'
+  ],
   app: {
     head: {
       link: [
@@ -32,10 +47,10 @@ export default defineNuxtConfig({
           rel: 'stylesheet',
           href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" 
         },
-        {
-          rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Raleway:wght@100;400&display=swap'
-        }
+        // {
+        //   rel: 'stylesheet',
+        //   href: 'https://fonts.googleapis.com/css2?family=Raleway:wght@100;400&display=swap'
+        // }
       ] 
     }
   },
