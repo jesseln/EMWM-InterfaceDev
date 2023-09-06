@@ -21,7 +21,8 @@
   <script setup>
   //libraryStore call is placed in this layout file as this will initially update the store state from the database for all pages.
   const libraryStore = useLibraryStore();
-
+  const yourShelfStore = useYourShelfStore();
+  
   libraryStore.getLibraryItems('Book','BookID');
 
   </script>
