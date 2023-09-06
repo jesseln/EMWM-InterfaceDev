@@ -1,74 +1,93 @@
 <template>
     <div class="library-wrapper">
-        <!-- Your Shelf -->
-        <!-- v-if youShelf.length -->
-        <!-- <div class="shelf" >
+ <!-- Your Shelf -->
+ <div class="shelf yourShelf" >
             <div class="shelf-title-box">
-                <h2 class="shelf-title">Your Shelf</h2>
+                <h2 class="yourShelf-title">Your Shelf</h2>
             </div>
             <div class="shelf-inner">
-                <div class="section-wrapper" v-for="bookend in yourShelf[1]" >
-                    <div class="section-outer">
-                    <div class="section-title-box" :style="{ height: maxItemHeight + 'px'}">
-                        <h3 class="section-category">Year Published </h3>
-                        <h3 class="section-value">{{ bookend[0] }}</h3>
+                <div class="section-wrapper" >
+                    <!-- <div class="section-outer"> -->
+                    <div class="section-title-box" :style="{ height: maxShelfHeight + 'px'}">
+                        <h3 class="yourShelf-section-category">Items on your shelf</h3>
+                        <h3 class="yourShelf-section-value">{{ yourShelf.length }}</h3>
+                        <div class="section-shelf-box">
+                        <!-- Shelf Box DO NOT DELETE -->
+                        </div>
                     </div>
-                        <div class="section-inner" :style="{ height: maxItemHeight + 'px'}">
-                            <div class="section-item-box" v-for="item in bookend[1]">
+                        <div class="section-inner" v-for="item in yourShelf" :style="{ height: maxShelfHeight + 'px'}">
+                          
                                 <VMenu
                                     placement="top" 
                                     :delay="{ show: 50, hide: 200 }"
                                 >
-                                    <div class="item" v-on="itemHandlers" :style="{ height: itemHeight(regexNum(item['Date of publication'])) + 'px' , background: itemColour(item['Genre/Identity']),
+                                    <div class="item" v-on="itemHandlers" :style="{ height: itemHeight(handleNumeric(item[libraryView.height], libraryView.height)) + 'px' , background: itemColour(handleColour(item, libraryView.colour)),
                                     width: minItemWidth + 'px'}" :class="{lowlight: isHighlight}">
-                                        <h3 class="item-value">{{ item.Title }}</h3>
+                                    <div class="item-value">
+                                        <p >{{ item[libraryView.label] }}</p>
+                                    </div>
                                     </div>
                                     <template #popper>
                                         <div>
+                                        <div class="item-menu-header-container">
+                                            <h2 class="item-menu-header">{{ libraryView.itemType }}</h2>
+                                            <h2 class="item-menu-subheader"> 
+                                                {{ libraryLabels[libraryView.itemType][libraryView.menuSubHeader] }}
+                                                {{ item[libraryView.menuSubHeader] }}
+                                            </h2>
+                                        </div>
                                         <div class="item-menu">
+                                            <div class="shelf-button-wrapper">
+                                                <button class="shelf-button" @click="yourShelfStore.removeFromShelf(item, item.itemType)">Remove from Shelf</button>
+                                            </div>
                                             <ul>
                                                 <li>
-                                                    <h4>Respository</h4>
-                                                    <p>{{ item['Repository'] }}</p>
+                                                    <h4>{{libraryLabels[libraryView.itemType][libraryView.shelf]}}</h4>
+                                                    <p>{{ item[libraryView.shelf] }}</p>
                                                 </li>
                                                 <li>
-                                                    <h4>Year Published</h4>    
-                                                    <p>{{ item['Date of publication'] }}</p>
+                                                    <h4>{{libraryLabels[libraryView.itemType][libraryView.bookend]}}</h4>    
+                                                    <p>{{ item[libraryView.bookend] }}</p>
                                                 </li>
                                                 <li>
-                                                    <h4>Title</h4>    
-                                                    <p>{{ item.Title }}</p>
+                                                    <h4>{{libraryLabels[libraryView.itemType][libraryView.label]}}</h4>    
+                                                    <p>{{ item[libraryView.label] }}</p>
                                                 </li>
                                                 <li>
-                                                    <h4>Author</h4>    
-                                                    <p>{{ item.Author }}</p>
+                                                    <h4>{{ libraryLabels[libraryView.itemType][libraryView.subMenuCategory1] }}</h4>    
+                                                    <p>{{ item[libraryView.subMenuCategory1] }}</p>
                                                 </li>
                                                 <li>
-                                                    <h4>Genre</h4>    
+                                                    <h4>{{ libraryLabels[libraryView.itemType][libraryView.subMenuCategory2] }}</h4>    
                                                     <template v-for="(genre, i) in item['Genre/Identity']">
                                                         <span>{{genre}}</span>{{ i < item['Genre/Identity'].length -1 ? ', ': '' }}
                                                     </template>
                                                 </li>
                                                 <li>
-                                                    <h4>Number of Marks</h4>    
-                                                        <p>{{item['Marginal Marks'].length}}</p>
+                                                    <h4>{{ libraryLabels[libraryView.itemType][libraryView.subMenuCategory3] }}</h4>    
+                                                        <p>{{item[libraryView.subMenuCategory3].length}}</p>
                                                 </li>
                                             </ul>
                                         </div>
                                     </div>
                                     </template>
                                 </VMenu>
-                            </div>
+                                <div class="section-shelf-box">
+                                <!-- Shelf Box DO NOT DELETE -->
+                                </div>
                         </div>
-                    </div>
-                    <div class="section-shelf-box"> -->
-                    <!-- Shelf Box DO NOT DELETE -->
-                    <!-- </div>
                 </div>
             </div>
-        </div> -->
-        
+        </div>
+        <div class="shelf-separator-container">
+            <div class="shelf-separator">
+                <!-- Your Shelf Separator -->
+            </div>
+        </div>
         <!-- The Library -->
+        <div>
+            <h1 class="library-title">The Library of Libraries</h1>
+        </div>
         <div class="shelf" v-for="shelf in mainLibrary">
             <div class="shelf-title-box">
                 <h2 class="shelf-title">{{shelf[0]}}</h2>
@@ -89,13 +108,25 @@
                                     placement="top" 
                                     :delay="{ show: 50, hide: 200 }"
                                 >
-                                    <div class="item" v-on="itemHandlers" :style="{ height: itemHeight(handleNumeric(item[libraryView.height], libraryView.height)) + 'px' , background: itemColour(handleNumeric(item[libraryView.colour], libraryView.colour)),
+                                    <div class="item" v-on="itemHandlers" :style="{ height: itemHeight(handleNumeric(item[libraryView.height], libraryView.height)) + 'px' , background: itemColour(handleColour(item, libraryView.colour)),
                                     width: minItemWidth + 'px'}" :class="{lowlight: isHighlight}">
-                                        <h3 class="item-value">{{ item[libraryView.label] }}</h3>
+                                    <div class="item-value">
+                                        <p >{{ item[libraryView.label] }}</p>
+                                    </div>
                                     </div>
                                     <template #popper>
                                         <div>
+                                        <div class="item-menu-header-container">
+                                            <h2 class="item-menu-header">{{ libraryView.itemType }}</h2>
+                                            <h2 class="item-menu-subheader"> 
+                                                {{ libraryLabels[libraryView.itemType][libraryView.menuSubHeader] }}
+                                                {{ item[libraryView.menuSubHeader] }}
+                                            </h2>
+                                        </div>
                                         <div class="item-menu">
+                                            <div class="shelf-button-wrapper">
+                                                <button class="shelf-button" @click="yourShelfStore.addToShelf(item, item.itemType)">Add to Shelf</button>
+                                            </div>
                                             <ul>
                                                 <li>
                                                     <h4>{{libraryLabels[libraryView.itemType][libraryView.shelf]}}</h4>
@@ -106,22 +137,22 @@
                                                     <p>{{ item[libraryView.bookend] }}</p>
                                                 </li>
                                                 <li>
-                                                    <h4>{{libraryLabels[libraryView.itemType][libraryView.title]}}</h4>    
-                                                    <p>{{ item[libraryView.title] }}</p>
+                                                    <h4>{{libraryLabels[libraryView.itemType][libraryView.label]}}</h4>    
+                                                    <p>{{ item[libraryView.label] }}</p>
                                                 </li>
                                                 <li>
-                                                    <h4>Author</h4>    
-                                                    <p>{{ item.Author }}</p>
+                                                    <h4>{{ libraryLabels[libraryView.itemType][libraryView.subMenuCategory1] }}</h4>    
+                                                    <p>{{ item[libraryView.subMenuCategory1] }}</p>
                                                 </li>
                                                 <li>
-                                                    <h4>Genre</h4>    
+                                                    <h4>{{ libraryLabels[libraryView.itemType][libraryView.subMenuCategory2] }}</h4>    
                                                     <template v-for="(genre, i) in item['Genre/Identity']">
                                                         <span>{{genre}}</span>{{ i < item['Genre/Identity'].length -1 ? ', ': '' }}
                                                     </template>
                                                 </li>
                                                 <li>
-                                                    <h4>Number of Marks</h4>    
-                                                        <p>{{item['Marginal Marks'].length}}</p>
+                                                    <h4>{{ libraryLabels[libraryView.itemType][libraryView.subMenuCategory3] }}</h4>    
+                                                        <p>{{item[libraryView.subMenuCategory3].length}}</p>
                                                 </li>
                                             </ul>
                                         </div>
@@ -159,6 +190,8 @@
         //Then apply filter functions below for grouping.
     }
 
+    console.log(yourShelfStore.yourShelf)
+
 
     ////////////////////////
     // LIBRARY VIEW OBJECT//
@@ -169,18 +202,19 @@
         shelf: 'Repository', //Primary sort
         useShelf: true,
         showShelf: true,
-        bookend: 'Size', //Secondary sort
+        bookend: 'Date of publication', //Secondary sort
         useBookend: true,
         showBookend: true,
-        height: 'Size',
+        height: 'Date of publication',
         useHeight: true,
-        colour: 'Size',
+        colour: 'Genre/Identity',
         useColour: true,
         label: 'Title',
         useLabel: true,
-        subMenuHeader1: 'Author',
-        subMenuHeader2: 'Genre/Identity',
-        subMenuHeader3: 'Author',
+        menuSubHeader: 'Shelfmark',
+        subMenuCategory1: 'Author',
+        subMenuCategory2: 'Genre/Identity',
+        subMenuCategory3: 'Marginal Marks', //Need to add counter options here
     }
 
     ///////////////////////
@@ -285,6 +319,19 @@
     ///////////
     // UTILS //
     ///////////
+    //Handles array, string, numeric and null values for colour
+    function handleColour(item, viewSelection){
+        if(item){
+            if(item[viewSelection]){
+                if(isNumber(item[viewSelection])) return handleNumeric(item[viewSelection])
+                if(isString(item[viewSelection])) return item[viewSelection]
+                if(isArray(item[viewSelection])) return item[viewSelection][0]
+            }
+            }else{
+                return null
+            }
+        }
+
     //Returns the longest series of numbers in a string
     function handleNumeric(value, viewSelection){
         const longestNumber = coerceNumber(longestNumberString(value))
@@ -342,9 +389,6 @@
     }
     //Check if any value in array is a number
     const containsNumber = (data, viewSelection) => data.some(d => isNumber(d[viewSelection]))
-    //This needs to be adjusted to be proportional. Perhaps even a bit more bespoke.
-
-
     //Check if any value in array is string
     const containsString = (data, viewSelection) => data.some(d => typeof(d[viewSelection])==='string')
     //Check if any value in array is array
@@ -384,7 +428,7 @@
     //Set Colour
     function formatColour(data, viewSelection){
         if(containsNumber(data, viewSelection)){
-            console.log('yes number')
+            console.log('Colour Continuous')
             console.log((d3.extent(data.map(d => handleNumeric(d[viewSelection], viewSelection)))))
             return d3.scaleLinear()
                         .domain(d3
@@ -395,25 +439,14 @@
                                 return handleNumeric(d[viewSelection], viewSelection)})))
                         .range(['royalblue', 'pink'])
                         .clamp(true)
-                        //Need to use ref for style on v-for loop. As the handler will need to change too.
         }
-        ////handleString()
-        // if(containsStringOrArray() === 'string'){
-        //     return d3.scaleOrdinal(d3.schemeSet3)
-        //             .domain(data.map((d) => {
-        //                 return d[viewSelection.colour] ? d[viewSelection.colour] : ""}))
-        // }
-        
-        //Current workaround. Need to set up function for this.
-        //handleArray()
-        console.log('nothing to see here')
+        console.log('Colour Ordinal')
         return d3.scaleOrdinal(d3.schemeSet3)
                     .domain(data.map((d) => {
-                    return d[viewSelection.colour] ? d[viewSelection.colour][0] : ""})) 
+                    return handleColour(d[viewSelection], viewSelection)})) 
         }
         //Note for dropdown - could use top select buttons?
         //Same functions for handle label
-        
         const isHighlight = ref(false);
         
     ////////////////////
@@ -434,6 +467,23 @@
     //Item Colour
     const itemColour =  computed (() => {
         return formatColour(parsedData.value, libraryView.colour);
+    })
+
+
+    ///////////////////////
+    // CREATE YOUR SHELF //
+    ///////////////////////
+    //Parse Data
+    const parsedDataYS = computed (() => {
+        return parseDatabase(yourShelfStore.yourShelf);
+    }) 
+    //Library Structure
+    const yourShelf = computed (() => {
+        if(null){
+        return formatLibrary(parsedDataYS.value, libraryView); //Shelves and Bookmarks included in 'YourShelf'
+        }else{
+            return parsedDataYS.value //Items only
+        }
     })
 
     ////////////////////
