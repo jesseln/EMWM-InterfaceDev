@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     '@nuxt/devtools',
     '@nuxtjs/supabase',
     'floating-vue/nuxt',
+    'nuxt-icons',
     '@nuxtjs/google-fonts',
     '@vueuse/nuxt' // @vueuse/nuxt an add-on of VueUse, which provides better Nuxt integration auto-import capabilities.
   ],

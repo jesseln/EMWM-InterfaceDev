@@ -2,7 +2,7 @@
     <div class="library-wrapper">
  <!-- Your Shelf -->
  <div class="shelf yourShelf" >
-            <div class="shelf-title-box">
+            <div class="yourShelf-title-box">
                 <h2 class="yourShelf-title">Your Shelf</h2>
             </div>
             <div class="shelf-inner">
@@ -84,6 +84,9 @@
                 <!-- Your Shelf Separator -->
             </div>
         </div>
+        <button ref="toTopButton" @click="scrollToTop" class="to-top-button">
+            ☝️
+        </button>
         <!-- The Library -->
         <div>
             <h1 class="library-title">The Library of Libraries</h1>
@@ -509,6 +512,29 @@
         return `translate(0, ${(isUp ? -10 : 0)}px)`
         }
     }
+
+    ///////////////////
+    // TO TOP BUTTON //
+    ///////////////////
+    const toTopButton = ref();
+    const userScroll = () => {
+      if (window.scrollY > 550) {
+        toTopButton.value.classList.add("showButton");
+        console.log('scrolled');
+      } else {
+        toTopButton.value.classList.remove("showButton");
+        console.log('top');
+      }
+    };
+    onMounted(() => {
+      window.addEventListener("scroll", userScroll);
+    });
+    onBeforeMount(() => {
+      window.removeEventListener("scroll", userScroll);
+    });
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
 
 </script>
 

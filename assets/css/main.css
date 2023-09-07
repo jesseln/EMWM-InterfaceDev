@@ -184,7 +184,21 @@ body {
 }
 
 .shelf-title-box{
-	/* position: absolute; */
+	position: sticky;
+	top: 0;
+	background-color: rgba(255, 255, 255, 0.5);
+	z-index: 1;
+	min-height: 2rem;
+	padding: 0.5rem 0;
+	pointer-events : none; 
+	/* pointer-events allows hover to pass through */
+}
+
+.yourShelf-title-box{
+	background-color: rgba(255, 255, 255, 0.5);
+	z-index: 1;
+	min-height: 1rem;
+	padding: 0.5rem 0;
 }
 
 .shelf-title {
@@ -281,7 +295,7 @@ body {
 .section-category {
 	padding: 0 10px;
 	font-family: 'Raleway', sans-serif;
-	font-size: 0.625rem;
+	font-size: 0.65rem;
 	font-weight: 400;
 	color: black;
 	width: 100px;
@@ -350,12 +364,12 @@ body {
 .item-value p{ 
 	writing-mode: vertical-rl;
 	text-overflow: ellipsis;
-	line-height: 0.7rem;
+	line-height: 0.8rem;
 	transform:scale(-1);
 	overflow:hidden;
 	cursor: default;
 	font-family: 'Raleway', sans-serif;
-	font-size: 0.6rem;
+	font-size: 0.7rem;
 	font-weight: 500;
 	color: rgb(30,30,30);
  }
@@ -451,8 +465,8 @@ body {
   text-decoration-thickness: auto;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   cursor: pointer;
-  user-select: none;
   -webkit-user-select: none;
+  user-select: none;
   touch-action: manipulation;
 }
 
@@ -472,3 +486,125 @@ body {
 .shelf-button:active {
 	box-shadow: none;
 }
+
+.to-top-button {
+	border-radius: 50%;
+	height: 3rem;
+	width: 3rem;
+	padding: 4px;
+	box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+	cursor: pointer;
+	position: fixed;
+	bottom: 3.5vw;
+	display: none;
+	right: 3.5vw;
+	background-color: rgb(255, 255, 255);
+	border: none;
+	border-radius: 50%;
+	color: black;
+	cursor: pointer;
+	font-size: 16px;
+	line-height: 48px;
+  }
+
+
+
+
+  .showButton {
+	display: block;
+  }
+
+
+  /* View SideBar */
+  
+.sidebar {
+	display: grid;
+	grid-template-rows: 2rem repeat(5, 1fr);
+	border-radius: 0 5px 5px 0;
+	color: black;
+	background-color: white;
+	float: left;
+	position: fixed;
+	z-index: 2;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	padding: 0.5em;
+	transition: 0.3s ease-in-out;
+	box-shadow: 1px 0 3px 0 rgba(0, 0, 0, 0.1), 1px 0 2px 0 rgba(0, 0, 0, 0.06);
+  }
+  
+  .sidebar h1 {
+	height: 2.5em;
+  }
+
+  
+  .sidebar h3{
+	color: #111827;
+	font-family:'Raleway', sans-serif;
+	font-size: 1rem;
+	font-weight: 500;
+	line-height: 1.2rem;
+	padding: 0.8rem 0;
+  }
+  
+  .collapse-icon {
+	grid-column-start: 1;
+	grid-column-end: 2;
+	position: absolute;
+	top: 0.5vw;
+	left: 22.1vw;
+	margin: 0.75em;
+	/* color: rgba(255, 255, 255, 0.7); */
+	cursor: pointer;
+	color: rgb(63, 63, 63);
+	transition: 0.3s ease-in-out;
+  }
+  
+  .rotate-180 {
+	transform: translate(-22vw, 0) rotate(180deg);
+	transition: 0.3s ease-in-out;
+  }
+
+  .colour-icon {
+	grid-row-start: 2;
+	grid-row-end: 3;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	/* cursor: pointer; */
+  }
+
+  .size-icon {
+	grid-row-start: 3;
+	grid-row-end: 4;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	/* cursor: pointer; */
+
+  }
+
+  .label-icon{
+	grid-row-start: 4;
+	grid-row-end: 5;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	/* cursor: pointer; */
+  }
+
+.arrange-icon{
+	grid-row-start: 5;
+	grid-row-end: 6;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	/* cursor: pointer; */
+  }
+
+  
