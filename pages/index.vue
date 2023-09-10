@@ -3,7 +3,7 @@
       <!-- <div class="home-header">
         <h2 class="home-header-title">The Library of Libraries</h2>
       </div> -->
-      <ViewSidebar />
+      <!-- <ViewSidebar /> -->
         <div v-if="libraryStore.libraryItems.length">
           <LibraryContainer :libraryItems="libraryStore.libraryItems" />
         </div>

@@ -8,11 +8,6 @@
       <path d="M11.6667 1.55554L7 7.20163L11.6667 12.4444" stroke="rgb(63, 63, 63)" stroke-width="1.55556" stroke-linejoin="round" fill="none"/>
       </svg>
     </div>
-       
-  
- 
-    
-
   
     <div class="colour-icon">
       <div v-if="collapsed"></div >
