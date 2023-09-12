@@ -12,6 +12,18 @@ export const useDatabase = () => {
         return tableData
       }
 
+      //Test Function
+      async function getTableTest(tableName: string, orderColumn: string) {
+        let tableSize: number =  await getTableCount(tableName) || 0;
+        let tableData: any = await getPaginatedDataTest(tableName,orderColumn,0,999);
+  
+        while(tableSize > tableData.length){
+          await getPaginatedData(tableName,orderColumn, tableData.length, tableData.length + 1000)
+          .then((data: any)=> {tableData.push(...data)})
+        }
+        return tableData
+      }
+
       async function getSingleRecord(tableName: string, id: {column: any, value: any}) {
         const { data, error } = await supabase
           .from(tableName)
@@ -28,9 +40,11 @@ export const useDatabase = () => {
       }
   
       async function getPaginatedData(tableName: string, orderColumn: string, from: number, to: number) {
+        const objectStructure = tableStructure(tableName)
         const { data, count, error } = await supabase
           .from(tableName)
-          .select("*", { count: "exact" })
+          .select(objectStructure, 
+          { count: "exact" })
           .order(orderColumn, { ascending: true })
           .range(from, to)
   
@@ -41,6 +55,24 @@ export const useDatabase = () => {
             return data
       }
     }
+
+    //Test Function
+    async function getPaginatedDataTest(tableName: string, orderColumn: string, from: number, to: number) {
+      const objectStructure = tableStructure(tableName)
+      const { data, count, error } = await supabase
+        .from(tableName)
+        .select(objectStructure, 
+        { count: "exact" })
+        .order(orderColumn, { ascending: true })
+        .range(from, to)
+
+        if(error) {
+          console.log(error)
+        }
+        if(data){
+          return data
+    }
+  }
   
       async function getTableCount(tableName: string) {
         const { data, count, error } = await supabase
@@ -78,8 +110,16 @@ export const useDatabase = () => {
           }
       }
 
+      function tableStructure(tableName: string){
+        if(tableName === 'Agents') return (`*, Marks(*, Books(*))`)
+        if(tableName === 'Books') return (`*, Marks(*, Agents(*))`)
+        if(tableName === 'Marks') return (`*, Agents(*), Books(*)`)
+        return (`*`)
+      }
+
       return {
         getTable,
+        getTableTest,
         getSingleRecord,
         getPaginatedData,
         getTableCount,

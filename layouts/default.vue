@@ -23,7 +23,9 @@
   const libraryStore = useLibraryStore();
   const yourShelfStore = useYourShelfStore();
   
-  libraryStore.getLibraryItems('Book','BookID');
+  libraryStore.getAgents();
+  libraryStore.getBooks();
+  libraryStore.getMarks();
 
   </script>
   

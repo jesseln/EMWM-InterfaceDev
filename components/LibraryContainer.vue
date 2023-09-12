@@ -581,7 +581,7 @@
     import * as d3 from "d3";
     import FloatingVue from 'floating-vue'
     import 'floating-vue/dist/style.css'
-    const {libraryItems} = defineProps(['libraryItems']);
+    const {agents, books, marks} = defineProps(['agents', 'books', 'marks']);
 
     //Responsive SVG Window Size | VueUse https://vueuse.org/core/useWindowSize/
     const { width, height } = useWindowSize()
@@ -688,9 +688,7 @@
             ['Other notes']: 'Other notes',
     })
 
-            //Omitted exxisting relational columns such as Book title and Female agent 
-           //Ideally to be picked up using relational database mechanisms
-
+    //Inverse Map - Created to reverse conversion as needed in one place only
     const invLibraryLabels = new Map();
     invLibraryLabels
     .set('Book', invertObject(libraryLabels.get('Book')))
@@ -921,7 +919,6 @@
             const value = d[viewSelection] ? handleColour(d, viewSelection) : "No Value"
             
             if(tempColourSet.has(value)){
-                console.log(value)
                 return tempColourSet.delete(value) //Returns true if deletion successful
             }else{
                 return false
@@ -937,7 +934,7 @@
     //////////////////
     //Parse Data
     const parsedData = computed (() => {
-        return parseDatabase(libraryItems);
+        return parseDatabase(books);
     }) 
     //Get item height bounds
     const getDomainIndex = computed (() => {
