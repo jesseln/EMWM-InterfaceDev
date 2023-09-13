@@ -1,54 +1,29 @@
-// import { defineStore } from 'pinia'
-
 export const useYourShelfStore = defineStore('yourShelf', ()=>{
 
     const yourShelf = ref([]) 
 
-    async function addToShelf(item, itemType) {
+    async function addToShelf(item) {
         let id; 
-        switch(itemType){
-            case 'Book':
-                id = 'BookID'
-                break
-            case 'Agent':
-                id = 'FemaleAgentID'
-                break
-            case 'Mark':
-                id = 'MargID'
-                break
-            default:
-                id = 'BookID'
-        }
+        if(item['FemaleAgentID']) id = 'FemaleAgentID'
+        if(item['BookID']) id = 'BookID'
+        if(item['MargID']) id = 'MargID'
 
-        // if(itemType === 'Book') id = 'BookID'
-        // if(itemType === 'Agent') id = 'FemaleAgentID'
-        // if(itemType === 'Mark') id = 'MargID'
+        const exists = yourShelf.value.find(i => i[id] === item[id]) 
 
-        const exists = yourShelf.value.find(i => i[id] === item[id]) //I like this approach. Should probably be a function though.
         if(exists) {
-          alert('Item already on shelf') //Placeholder for modal option
+            alert('Item already on shelf') //Placeholder for modal option
         }
         if(!exists) {
-        yourShelf.value.push({...item}) //This syntax is useful.  Note spread object, is then enclosed in an object.
-        //Update database or local memory here.
+            yourShelf.value.push({...item}) 
         }
       }
 
-      async function removeFromShelf(item, itemType) {
+      async function removeFromShelf(item) {
         let id; 
-        switch(itemType){
-            case 'Book':
-                id = 'BookID'
-                break
-            case 'Agent':
-                id = 'FemaleAgentID'
-                break
-            case 'Mark':
-                id = 'MargID'
-                break
-            default:
-                id = 'BookID'
-        }
+        if(item['FemaleAgentID']) id = 'FemaleAgentID'
+        if(item['BookID']) id = 'BookID'
+        if(item['MargID']) id = 'MargID'
+
         yourShelf.value = yourShelf.value.filter(d => d[id] !== item[id])
       }
 

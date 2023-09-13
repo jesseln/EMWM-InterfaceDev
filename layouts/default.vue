@@ -22,10 +22,15 @@
   //libraryStore call is placed in this layout file as this will initially update the store state from the database for all pages.
   const libraryStore = useLibraryStore();
   const yourShelfStore = useYourShelfStore();
+  const { parseDatabase } = useViewStore();
   
-  libraryStore.getAgents();
+  // libraryStore.getAgents();
   libraryStore.getBooks();
-  libraryStore.getMarks();
+  // libraryStore.getMarks();
+  watchEffect(()=>{
+    parseDatabase(libraryStore.books)
+  })
+  
 
   </script>
   
