@@ -29,11 +29,75 @@ export const useUtils = () => {
             return value
         }
     }
-    //Find 4 digit number if exists in string - Originally Designed for Year Columns
-    // function regexNum(value: string){
-    //     const regex = /(?=(\d{4}))/g;
-    //     return regex.exec(value) ? coerceNumber(regex.exec(value)[1]) : null
-    // }
+
+    //Checks all properties on path exist and returns handled value
+    function handleObjectPath(item: any, viewMode: string, ...path: any) {
+        if(!item) return false
+        let obj = item;
+        for (let i = 0; i < path.length; i++) {
+            let prop = path[i];
+        
+            if (!obj || !obj.hasOwnProperty(prop)) {
+              return false;
+            } else {
+              obj = obj[prop];
+            }
+          }
+          if(viewMode === 'colour') {
+              return handleColourValue(obj);
+            }else if(viewMode === 'height'){
+              return handleValue(obj);
+          }else{
+              return handleValue(obj);
+          }
+
+    }
+
+    //Returns handled values based on type
+    function handleValue(value: any){
+        if(!value || value.length === 0) return false
+
+        if(isNumber(value)){
+            return handleNumeric(value)
+            
+        }else if(isString(value)){
+            return value
+
+        }else if(isArray(value)){
+            return handleArray(value)
+
+        }
+    }
+
+    //Returns unpacked array values for non-specialised viewModes
+    //For arrays longer than one position returns string split by ', ' and '&' before last position.
+    function handleArray(value: any){
+        if(!value || value.length === 0) return false
+
+        if(value.length === 1){
+            return value[0]
+        }else{
+            value.sort()
+            return value.slice(0, -1).join(', ')+' & '+value.slice(-1);
+        }
+    }
+
+    //Returns values for special case of Colour viewMode
+    function handleColourValue(value: any){
+        if(!value || value.length === 0) return false
+
+        if(isNumber(value)){
+            return handleNumeric(value)
+            
+        }else if(isString(value)){
+            return value
+
+        }else if(isArray(value)){
+            return value[0]
+
+        }
+    }
+
     //Clamp Function
     const clamp = (min: any, value: any, max: any) => value ? Math.min(Math.max(value, min), max) : value
     //Numeric coersion of single value
@@ -84,6 +148,10 @@ export const useUtils = () => {
         handleNumeric,
         clamp,
         longestNumberString,
+        handleObjectPath,
+        handleValue,
+        handleArray,
+        handleColourValue,
         coerceNumber,
         isNumber,
         isString,

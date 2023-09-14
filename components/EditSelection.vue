@@ -37,7 +37,7 @@
                                     <li v-for=" category in categoryMap.get(itemType)"> 
                                         <div class="item-menu">
                                             <div class="shelf-button-wrapper">
-                                                <button class="shelf-button" @click="viewStore.handleViewSelection(viewMode, invCategoryMap.get(itemType)[category], itemType)">
+                                                <button class="shelf-button" @click="handleViewSelection(viewMode, invCategoryMap.get(itemType)[category], itemType)">
                                                     <h4>{{category}}</h4>
                                                 </button>
                                             </div>
@@ -73,19 +73,22 @@ const { libraryData,
         itemColour, 
         viewHeightBounds, 
         viewColourSet } = storeToRefs(viewStore)
-
+const { parseDatabase,
+        handleViewSelection,
+        getIDP,
+        handleColour } = useViewStore();
+    
 //Your Shelf State
 const yourShelfStore = useYourShelfStore();
-const { yourShelf, 
-        addToShelf, 
-        removeFromShelf }  = storeToRefs(yourShelfStore)
+const { yourShelf }  = storeToRefs(yourShelfStore)
+const { addToShelf, 
+        removeFromShelf } = useYourShelfStore();
 
 //Reference Constants
 const referenceStore = useReferenceStore();
 const { categoryMap, 
         invCategoryMap, 
         scales } = storeToRefs(referenceStore)
-
 
 // COMPOPSABLES
 //Utility Functions

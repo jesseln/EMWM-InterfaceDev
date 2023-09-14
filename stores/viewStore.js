@@ -3,6 +3,10 @@ import * as d3 from "d3";
 export const useViewStore = defineStore('view', ()=>{
     const { scales } = useReferenceStore();
     const { handleNumeric,
+            handleObjectPath,
+            handleValue,
+            handleArray,
+            handleColourValue,
             isNumber,
             isString,
             isArray,
@@ -75,7 +79,8 @@ export const useViewStore = defineStore('view', ()=>{
     // INTERNAL GETTERS //
     //Get item height bounds
     const getDomainIndex = computed (() => {
-        return processDomain(libraryData.value, libraryDisplay.view.height)
+        return {min: d3.minIndex(libraryData.value, d => getIDP(d, 'height')), 
+                max: d3.maxIndex(libraryData.value, d => getIDP(d, 'height'))}
     })
 
     //Get unique values in colour set
@@ -90,11 +95,11 @@ export const useViewStore = defineStore('view', ()=>{
     })
     //Item Height - Returns d3 Scale Function
     const itemHeight =  computed (() => {
-        return formatHeight(libraryData.value);
+        return formatHeight(libraryData.value, libraryDisplay);
     })
     //Item Colour - Returns d3 Scale Function
     const itemColour =  computed (() => {
-        return formatColour(libraryData.value);
+        return formatColour(libraryData.value, libraryDisplay);
     })
 
     // CREATE VIEW EDITOR //
@@ -111,29 +116,29 @@ export const useViewStore = defineStore('view', ()=>{
     // INTERNAL FUNCTIONS //
     // FORMAT LIBRARY //
     //Set Shelves
-    function formatShelf(data, viewSelection){
-        return d3.flatGroup(d3.sort(data, d=> d[viewSelection]), d => d[viewSelection]); 
+    function formatShelf(data, viewMode){
+        return d3.flatGroup(d3.sort(data, d=> getIDP(d, viewMode)), d => getIDP(d, viewMode)); 
     }
     //Set Bookends
-    function formatBookend(data, viewSelection){
+    function formatBookend(data, viewMode){
         return data
-        .map(d => [d[0],d3.flatGroup(d3.sort(d[1], d=> d[viewSelection]), d=> d[viewSelection])]);  
+        .map(d => [d[0],d3.flatGroup(d3.sort(d[1], d=> getIDP(d, viewMode)), d=> getIDP(d, viewMode))]);  
     }
     //Combine Shelves & Bookend
     function formatLibrary(data, display) {
         //Shelves - Sort & Group Items by Shelf Category
         const shelfFormatData = display.view.useShelf 
-        ? formatShelf(data, display.view.shelf) 
-        : formatShelf(data, display.view.id); //Default
+        ? formatShelf(data, 'shelf') 
+        : formatShelf(data, 'id'); //Default
         //Bookends - Further Sort & Group Items by Bookend Category
         const shelfBookendFormatData = display.view.useBookend 
-        ? formatBookend(shelfFormatData, display.view.bookend) 
-        : formatBookend(shelfFormatData, display.view.id); //Default
+        ? formatBookend(shelfFormatData, 'bookend') 
+        : formatBookend(shelfFormatData, 'id'); //Default
         return shelfBookendFormatData
     }
 
     // HANDLE HEIGHT //
-    function formatHeight(data) {
+    function formatHeight(data, view) {
         return d3.scaleLinear()
                     .domain(chooseHeightDomain(data)) 
                     .unknown(scales.maxItemHeight) //Set all non-numeric values to max height
@@ -147,40 +152,37 @@ export const useViewStore = defineStore('view', ()=>{
                 return [1450, 1750] //was - clamp(1450, longestNumber, 1750)
             }else{
                 const domainIndex = getDomainIndex.value
-                return [data[domainIndex.min][viewSelection], data[domainIndex.max][viewSelection]]
+                return [getIDP(data[domainIndex.min], 'height'), getIDP(data[domainIndex.max], 'height')]
             }
     }
 
     // HANDLE COLOUR //
-    function formatColour(data){
-        const viewSelection = libraryDisplay.view.colour
-        if(containsNumber(data, viewSelection)){
+    function formatColour(data, view){
+        if(data.some(d => isNumber(getIDP(d, 'colour')))){
             console.log('Colour Continuous')
             return d3.scaleLinear()
                         .domain(d3
                             .extent(data
-                            .filter(d => handleNumeric(d[viewSelection], viewSelection))
+                            .filter(d => getIDP(d, 'colour'))
                             .map(d => {
-                                return handleNumeric(d[viewSelection], viewSelection)})))
+                                return getIDP(d, 'colour')})))
                         .range(['royalblue', 'pink'])
                         .clamp(true)
         }
         console.log('Colour Ordinal')
         return d3.scaleOrdinal(d3.schemeSet3)
                     .domain(data.map((d) => {
-                    return handleColour(d[viewSelection])})) 
+                    return getIDP(d, 'colour')})) 
         }
 
     function processColourSet(data){
-        const viewSelection = libraryDisplay.view.colour
-        return new Set(data.flatMap(d => d[viewSelection] ? handleColour(d) : 'No Value'))
+        return new Set(data.flatMap(d => getIDP(d, 'colour')))
     }
 
     function processColourItems(data, colourSet){
-        const viewSelection = libraryDisplay.view.colour
         let tempColourSet = colourSet;
         const uniqueColours = data.filter((d) => {
-            const value = d[viewSelection] ? handleColour(d) : "No Value"
+            const value = getIDP(d, 'colour')
             if(tempColourSet.has(value)){
                 return tempColourSet.delete(value) //Returns true if deletion successful
             }else{
@@ -208,43 +210,37 @@ export const useViewStore = defineStore('view', ()=>{
     //Returns the path from the itemType (via the ID name) to the itemType of the viewMode (via viewType LookUp)
     //getIDP - getItemDisplayPath - Condensed for frequent use.
     function getIDP(item, viewMode) {
+        let value;
         if(!item) return null
         const viewSelection = libraryDisplay.view[viewMode]
         const viewModeType = libraryDisplay.viewType[viewMode]
         const itemType = item['FemaleAgentID'] ? 'Agent' :
                          item['BookID'] ? 'Book' :
                          item['MargID'] ? 'Mark' : ''
-        //Agent Item paths
-        if(itemType === 'Agent' && viewModeType === 'Agent') return item[viewSelection]
-        if(itemType === 'Agent' && viewModeType === 'Mark') return item['Marks'][0][viewSelection]
-        if(itemType === 'Agent' && viewModeType === 'Book') return item['Marks'][0]['Book'][viewSelection]
-        //Book Item paths                 
-        if(itemType === 'Book' && viewModeType === 'Book') return item[viewSelection]
-        if(itemType === 'Book' && viewModeType === 'Mark') return item['Marks'][0][viewSelection]
-        if(itemType === 'Book' && viewModeType === 'Agent') return item['Marks'][0]['Agent'][viewSelection]
-        //Mark Item paths
-        if(itemType === 'Mark' && viewModeType === 'Mark') return item[viewSelection]
-        if(itemType === 'Mark' && viewModeType === 'Agent') return item['Agent'][viewSelection]
-        if(itemType === 'Mark' && viewModeType === 'Book') return item['Book'][viewSelection]
 
+        // console.log('item',item)
+        // console.log('hasOwnProperty: Marks', item.hasOwnProperty('Marks'))
+        // console.log('Length: Marks', item['Marks'].length)
+        // console.log('item type', itemType, 'viewSelection', viewSelection, 'viewModeType', viewModeType)
+        //Agent Item paths
+        if(itemType === 'Agent' && viewModeType === 'Agent') value = handleObjectPath(item, viewMode, viewSelection)
+        if(itemType === 'Agent' && viewModeType === 'Mark') value = handleObjectPath(item, viewMode, 'Marks', 0, viewSelection)
+        if(itemType === 'Agent' && viewModeType === 'Book') value = handleObjectPath(item, viewMode, 'Marks', 0, 'Books', viewSelection)
+        //Book Item paths                 
+        if(itemType === 'Book' && viewModeType === 'Book') value = handleObjectPath(item, viewMode, viewSelection)
+        if(itemType === 'Book' && viewModeType === 'Mark') value = handleObjectPath(item, viewMode,'Marks',0,viewSelection)
+        if(itemType === 'Book' && viewModeType === 'Agent') value = handleObjectPath(item, viewMode, 'Marks', 0, 'Agents', viewSelection)
+        //Mark Item paths
+        if(itemType === 'Mark' && viewModeType === 'Mark') value = handleObjectPath(item, viewMode, viewSelection)
+        if(itemType === 'Mark' && viewModeType === 'Agent') value = handleObjectPath(item, viewMode, 'Agents', viewSelection) 
+        if(itemType === 'Mark' && viewModeType === 'Book') value = handleObjectPath(item, viewMode, 'Books', viewSelection)
+
+        return value ? value : "no data"
+        
         //Add editor for No Value - return "No Data"
         // var [marks, markIndex, agent]  = libraryDisplay.BookLookUp[libraryDisplay.viewType[viewMode]].split(',')
         //     return item[marks][markIndex][agent]
     }
-
-    //Handles array, string, numeric and null values for colour
-    function handleColour(item){
-        const viewSelection = libraryDisplay.view.colour
-        if(item){
-            if(item[viewSelection]){
-                if(isNumber(item[viewSelection])) return handleNumeric(item[viewSelection])
-                if(isString(item[viewSelection])) return item[viewSelection]
-                if(isArray(item[viewSelection])) return item[viewSelection][0]
-            }
-            }else{
-                return null
-            }
-        }
 
 
       return {  libraryData,
@@ -256,6 +252,5 @@ export const useViewStore = defineStore('view', ()=>{
                 viewColourSet,
                 parseDatabase,
                 handleViewSelection,
-                getIDP,
-                handleColour  }
+                getIDP  }
   })

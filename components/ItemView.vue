@@ -3,10 +3,10 @@
             placement="top" 
             :delay="{ show: 50, hide: 200 }"
         >
-            <div class="item" v-on="itemHandlers" :style="{ height: itemHeight(handleNumeric(item[libraryDisplay.view.height])) + 'px' , background: itemColour(handleColour(item)),
+            <div class="item" v-on="itemHandlers" :style="{ height: itemHeight(getIDP(item,'height')) + 'px' , background: itemColour(getIDP(item, 'colour')),
             width:scales.minItemWidth + 'px'}" :class="{lowlight: isHighlight}">
             <div class="item-value">
-                <p >{{ item[libraryDisplay.view.label] }}</p>
+                <p >{{ getIDP(item, itemBundle.labelViewMode) }}</p>
             </div>
             </div>
             <template #popper>
@@ -14,8 +14,8 @@
                 <div class="item-menu-header-container">
                     <h2 class="item-menu-header">{{ libraryDisplay.view.itemType }}</h2>
                     <h2 class="item-menu-subheader"> 
-                        {{ categoryMap.get(libraryDisplay.view.itemType)[libraryDisplay.view.menuSubHeader] }}
-                        {{ item[libraryDisplay.view.menuSubHeader] }}
+                        {{ categoryMap.get(libraryDisplay.viewType.menuSubHeader)[libraryDisplay.view.menuSubHeader] }}
+                        {{ getIDP(item, 'menuSubHeader') }}
                     </h2>
                 </div>
                 <div class="item-menu">
@@ -24,30 +24,31 @@
                     </div>
                     <ul>
                         <li>
-                            <h4>{{categoryMap.get(libraryDisplay.view.itemType)[libraryDisplay.view.shelf]}}</h4>
-                            <p>{{ item[libraryDisplay.view.shelf] }}</p>
+                            <h4>{{categoryMap.get(libraryDisplay.viewType.shelf)[libraryDisplay.view.shelf]}}</h4>
+                            <p>{{ getIDP(item, 'shelf') }}</p>
                         </li>
                         <li>
-                            <h4>{{categoryMap.get(libraryDisplay.view.itemType)[libraryDisplay.view.bookend]}}</h4>    
-                            <p>{{ item[libraryDisplay.view.bookend] }}</p>
+                            <h4>{{categoryMap.get(libraryDisplay.viewType.bookend)[libraryDisplay.view.bookend]}}</h4>    
+                            <p>{{ getIDP(item, 'bookend') }}</p>
                         </li>
                         <li>
-                            <h4>{{categoryMap.get(libraryDisplay.view.itemType)[libraryDisplay.view.label]}}</h4>    
-                            <p>{{ item[libraryDisplay.view.label] }}</p>
+                            <h4>{{categoryMap.get(libraryDisplay.viewType.label)[libraryDisplay.view.label]}}</h4>    
+                            <p>{{ getIDP(item, 'label') }}</p>
                         </li>
                         <li>
-                            <h4>{{ categoryMap.get(libraryDisplay.view.itemType)[libraryDisplay.view.subMenuCategory1] }}</h4>    
-                            <p>{{ item[libraryDisplay.view.subMenuCategory1] }}</p>
+                            <h4>{{ categoryMap.get(libraryDisplay.viewType.subMenuCategory1)[libraryDisplay.view.subMenuCategory1] }}</h4>    
+                            <p>{{ getIDP(item, 'subMenuCategory1') }}</p>
                         </li>
                         <li>
-                            <h4>{{ categoryMap.get(libraryDisplay.view.itemType)[libraryDisplay.view.subMenuCategory2] }}</h4>    
-                            <template v-for="(genre, i) in item['Genre/Identity']">
+                            <h4>{{ categoryMap.get(libraryDisplay.viewType.subMenuCategory2)[libraryDisplay.view.subMenuCategory2] }}</h4>    
+                            <p> {{ getIDP(item, 'colour') }} </p>
+                            <!-- <template v-for="(genre, i) in item['Genre/Identity']">
                                 <span>{{genre}}</span>{{ i < item['Genre/Identity'].length -1 ? ', ': '' }}
-                            </template>
+                            </template> -->
                         </li>
                         <li>
-                            <h4>{{ categoryMap.get(libraryDisplay.view.itemType)[libraryDisplay.view.subMenuCategory3] }}</h4>    
-                                <p>{{item[libraryDisplay.view.subMenuCategory3].length}}</p>
+                            <h4>{{ categoryMap.get(libraryDisplay.viewType.subMenuCategory3)[libraryDisplay.view.subMenuCategory3] }}</h4>    
+                                <p>{{ getIDP(item, 'subMenuCategory3') }}</p>
                         </li>
                     </ul>
                 </div>
@@ -70,7 +71,7 @@
     //Props
     const {item, itemBundle} = defineProps(['item', 'itemBundle']);
 
-   // STATE MANAGERS IMPORT //    
+    // STATE MANAGERS IMPORT //    
     //View State
     const viewStore = useViewStore();
     const { libraryData,
@@ -82,19 +83,19 @@
             viewColourSet } = storeToRefs(viewStore)
     const { parseDatabase,
             handleViewSelection,
-            getIDP,
-            handleColour } = useViewStore();
-
+            getIDP } = useViewStore();
+        
     //Your Shelf State
     const yourShelfStore = useYourShelfStore();
     const { yourShelf }  = storeToRefs(yourShelfStore)
+    const { addToShelf, 
+           removeFromShelf } = useYourShelfStore();
 
     //Reference Constants
     const referenceStore = useReferenceStore();
     const { categoryMap, 
             invCategoryMap, 
             scales } = storeToRefs(referenceStore)
-
 
     // COMPOPSABLES
     //Utility Functions

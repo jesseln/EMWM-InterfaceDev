@@ -430,12 +430,12 @@ body {
 }
 
 .item{
-	padding: 5px 2.5px;
+	padding: 0.5rem 0.25rem;
     margin: 0px;
     display: flex;
     flex-wrap: nowrap;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: flex-start;
     align-content: center;
     align-items: center;
 	border-radius: 2.5px;

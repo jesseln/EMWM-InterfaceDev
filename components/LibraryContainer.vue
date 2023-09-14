@@ -57,7 +57,7 @@
                     <!-- <div class="section-outer"> -->
                     <div class="section-title-box" :style="{ height: scales.maxShelfHeight + 'px'}">
                         <h3 class="view-section-category">Lowest Value </h3>
-                        <h3 class="view-section-value">{{ `"${viewHeightBounds[0][libraryDisplay.view.height]}"` }}</h3>
+                        <h3 class="view-section-value">{{ `"${getIDP(viewHeightBounds[0], 'height')}"` }}</h3>
                         <div class="section-shelf-box">
                         <!-- Shelf Box DO NOT DELETE -->
                         </div>
@@ -67,7 +67,7 @@
                         </div>
                         <div class="view-section-title-box-rhs" :style="{ height: scales.maxShelfHeight + 'px'}">
                         <h3 class="view-section-category">Highest Value </h3>
-                        <h3 class="view-section-value">{{ `"${viewHeightBounds[1][libraryDisplay.view.height]}"` }}</h3>
+                        <h3 class="view-section-value">{{ `"${getIDP(viewHeightBounds[1], 'height')}"` }}</h3>
                         <div class="section-shelf-box">
                         <!-- Shelf Box DO NOT DELETE -->
                         </div>
@@ -107,7 +107,7 @@
                         </div>
                     </div>
                         <div class="section-inner" v-for="item in  viewColourSet" :style="{ height: scales.maxShelfHeight + 'px'}">
-                            <ItemView :item="item" :itemBundle="viewEditItemBundle"/>
+                            <ItemView :item="item" :itemBundle="viewColourItemBundle"/>
                         </div>
                 </div>
             </div>
@@ -146,7 +146,7 @@
                 <div class="section-wrapper" v-for="bookend in shelf[1]" >
                     <!-- <div class="section-outer"> -->
                     <div class="section-title-box" :style="{ height: scales.maxShelfHeight + 'px'}">
-                        <h3 class="section-category">{{ categoryMap.get(libraryDisplay.view.itemType)[libraryDisplay.view.bookend] }}</h3>
+                        <h3 class="section-category">{{ categoryMap.get(libraryDisplay.viewType.bookend)[libraryDisplay.view.bookend] }}</h3>
                         <h3 class="section-value">{{ bookend[0] }}</h3>
                         <div class="section-shelf-box">
                         <!-- Shelf Box DO NOT DELETE -->
@@ -174,11 +174,15 @@
             itemColour, 
             viewHeightBounds, 
             viewColourSet } = storeToRefs(viewStore)
-
-
+    const { parseDatabase,
+            handleViewSelection,
+            getIDP } = useViewStore();
+        
     //Your Shelf State
     const yourShelfStore = useYourShelfStore();
     const { yourShelf }  = storeToRefs(yourShelfStore)
+    const { addToShelf, 
+           removeFromShelf } = useYourShelfStore();
 
     //Reference Constants
     const referenceStore = useReferenceStore();
@@ -186,31 +190,46 @@
             invCategoryMap, 
             scales } = storeToRefs(referenceStore)
 
+
+    // COMPOPSABLES
+    //Utility Functions
+    const { handleNumeric } = useUtils();
+
     //Objects passed to Components 
     const libraryItemBundle = computed (() => {
         return {
-            yourShelfFunction: yourShelfStore.addToShelf,
-            yourShelfText: 'Add to Shelf'
+            yourShelfFunction: addToShelf,
+            yourShelfText: 'Add to Shelf',
+            labelViewMode: 'label'
         }
     })
 
     const yourShelfItemBundle = computed (() => {
         return {
-            yourShelfFunction: yourShelfStore.removeFromShelf,
-            yourShelfText: 'Remove from Shelf'
+            yourShelfFunction: removeFromShelf,
+            yourShelfText: 'Remove from Shelf',
+            labelViewMode: 'label'
         }
     })
 
     const viewEditItemBundle = computed (() => {
         return {
-            yourShelfFunction: yourShelfStore.addToShelf,
-            yourShelfText: 'Add to Shelf'
+            yourShelfFunction: addToShelf,
+            yourShelfText: 'Add to Shelf',
+            labelViewMode: 'label'
         }
     })
 
-    // COMPOPSABLES
-    //Utility Functions
-    const { handleNumeric } = useUtils();
+    const viewColourItemBundle = computed (() => {
+        return {
+            yourShelfFunction: addToShelf,
+            yourShelfText: 'Add to Shelf',
+            labelViewMode: 'colour'
+        }
+    })
+
+
+
 
     //Kept due to temporary use in template.
     const isHighlight = ref(false);
