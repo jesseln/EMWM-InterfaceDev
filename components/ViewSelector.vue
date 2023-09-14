@@ -90,11 +90,6 @@ const { categoryMap,
         invCategoryMap, 
         scales } = storeToRefs(referenceStore)
 
-// COMPOPSABLES
-//Utility Functions
-const { handleNumeric } = useUtils();
-
-
 
 //Kept due to temporary use in template.
 const isHighlight = ref(false);

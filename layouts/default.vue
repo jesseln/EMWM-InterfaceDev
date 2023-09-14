@@ -24,11 +24,13 @@
   const yourShelfStore = useYourShelfStore();
   const { parseDatabase } = useViewStore();
   
-  // libraryStore.getAgents();
+  libraryStore.getAgents();
   libraryStore.getBooks();
-  // libraryStore.getMarks();
+  libraryStore.getMarks();
   watchEffect(()=>{
+    // parseDatabase(libraryStore.agents)
     parseDatabase(libraryStore.books)
+    // parseDatabase(libraryStore.marks)
   })
   
 

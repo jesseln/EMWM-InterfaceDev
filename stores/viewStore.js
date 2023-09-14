@@ -220,7 +220,7 @@ export const useViewStore = defineStore('view', ()=>{
 
         // console.log('item',item)
         // console.log('hasOwnProperty: Marks', item.hasOwnProperty('Marks'))
-        // console.log('Length: Marks', item['Marks'].length)
+        // console.log('Length: Marks', item['Books'].length)
         // console.log('item type', itemType, 'viewSelection', viewSelection, 'viewModeType', viewModeType)
         //Agent Item paths
         if(itemType === 'Agent' && viewModeType === 'Agent') value = handleObjectPath(item, viewMode, viewSelection)
