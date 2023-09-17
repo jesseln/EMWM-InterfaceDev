@@ -110,6 +110,40 @@ export const useDatabase = () => {
           }
       }
 
+      //Updates column in table by applying a callback to a source column and returning the value to the update column.
+      async function updateCalulatedColumn(tableName: string, idColumn: string, sourceColumn: any, updateColumn: any, updateFunction: any){
+        const tableData: any = await getTable(tableName, idColumn)
+        let updateCount: number = 0;
+        let failCount: number = 0;
+        for (var record of tableData) {
+          let updateValue: any = updateFunction(record[sourceColumn])
+          if(updateValue){
+            // Activate below after checking console.log return
+            // await updateRecord(tableName, {[updateColumn]: updateValue}, {column: idColumn, value: record[idColumn]}) 
+            console.log(`Pos ID ${record} + updateValue ${updateValue}`)
+            updateCount++
+          }
+          // Use below if Zero values are permitted
+          // else if (updateValue === 0){
+          //   await updateRecord(tableName, {[updateColumn]: updateValue}, {column: idColumn, value: record[idColumn]})
+          //   console.log(`Fail ID ${record} + updateValue ${updateValue}`)
+          //   failCount++
+          // }
+          else{
+            console.log(`Non-Zero Fail ID ${record} + updateValue ${updateValue}`)
+            failCount++
+          }
+        }
+        console.log(updateCount, failCount)
+
+        //Examples of previous calls
+        /*
+        updateCalulatedColumn('Books','BookID','Marginal Marks','Number of marks', (arr) => arr ? arr.length : 0)
+        updateCalulatedColumn('Books','BookID','Book image/s','Number of book images', (arr) => arr ? arr.length : 0)
+        updateCalulatedColumn('Agents','FemaleAgentID','MargID','Number of marks', (arr) => arr ? arr.length : 0)
+        */
+      }
+
       function tableStructure(tableName: string){
         if(tableName === 'Agents') return (`*, Marks(*, Books(*))`)
         if(tableName === 'Books') return (`*, Marks(*, Agents(*))`)
@@ -120,6 +154,7 @@ export const useDatabase = () => {
       return {
         getTable,
         getTableTest,
+        updateCalulatedColumn,
         getSingleRecord,
         getPaginatedData,
         getTableCount,

@@ -1,21 +1,23 @@
 <template>
     <div class="shelf yourShelf" >
         <div class="yourShelf-title-box">
-            <h2 class="yourShelf-title">Your Shelf</h2>
-            <p class="yourShelf-description">Items can be added to your shelf by selecting an item in the library, and clicking Add to Shelf.</p>
+            <h2 class="library-title">Your Collection</h2>
+            <p class="yourShelf-description">Items can be added to your collection by selecting them in the library, and clicking Add to Collection.</p>
         </div>
         <div class="shelf-inner">
             <div class="section-wrapper" >
                 <!-- <div class="section-outer"> -->
                 <div class="section-title-box" :style="{ height: scales.maxShelfHeight + 'px'}">
-                    <h3 class="yourShelf-section-category">Items on your shelf</h3>
+                    <h3 class="yourShelf-section-category">Items in your collection</h3>
                     <h3 class="yourShelf-section-value">{{ yourShelf ? yourShelf.length : 0 }}</h3>
-                    <div class="section-shelf-box">
-                    <!-- Shelf Box DO NOT DELETE -->
-                    </div>
+                        <div class="section-shelf-box">
+                            <!-- Shelf Box DO NOT DELETE -->
+                        </div>
                 </div>
-                    <div class="section-inner" v-for="item in yourShelf" :style="{ height: scales.maxShelfHeight + 'px'}">
-                        <ItemView :item="item" :itemBundle="yourShelfItemBundle"/>
+                    <div class="section-inner" v-for="item in yourShelf" :key="JSON.stringify(item)" :style="{ height: scales.maxShelfHeight + 'px'}">
+                        <AgentItem v-if="itemTypeCheck(item) === 'Agent'" :item="item" :itemBundle="yourShelfItemBundle.agents"/>
+                        <BookItem v-if="itemTypeCheck(item) === 'Book'" :item="item" :itemBundle="yourShelfItemBundle.books"/>
+                        <MarkItem v-if="itemTypeCheck(item) === 'Mark'" :item="item" :itemBundle="yourShelfItemBundle.marks"/>
                     </div>
             </div>
         </div>
@@ -37,7 +39,8 @@
             viewColourSet } = storeToRefs(viewStore)
     const { parseDatabase,
             handleViewSelection,
-            getIDP } = useViewStore();
+            getIDP,
+            itemTypeCheck } = useViewStore();
         
     //Your Shelf State
     const yourShelfStore = useYourShelfStore();
@@ -49,16 +52,9 @@
     const referenceStore = useReferenceStore();
     const { categoryMap, 
             invCategoryMap, 
-            scales } = storeToRefs(referenceStore)
+            scales,
+            yourShelfItemBundle } = storeToRefs(referenceStore)
 
-    //Bundle Object passed to Components
-    const yourShelfItemBundle = computed (() => {
-        return {
-            yourShelfFunction: removeFromShelf,
-            yourShelfText: 'Remove from Shelf',
-            labelViewMode: 'label'
-        }
-    })
 
 
 </script>

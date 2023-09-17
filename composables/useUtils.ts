@@ -50,7 +50,17 @@ export const useUtils = () => {
           }else{
               return handleValue(obj);
           }
+    }
 
+    //Checks for valid property and returns handled value
+    function handleObjectProperty(obj: any, prop: any) {
+        let value;
+        if (!obj || !obj.hasOwnProperty(prop)) {
+            return 'no data';
+        } else {
+            value = handleValue(obj[prop]);
+        }
+        return  value ? value : 'no data'
     }
 
     //Returns handled values based on type
@@ -87,7 +97,7 @@ export const useUtils = () => {
         if(!value || value.length === 0) return false
 
         if(isNumber(value)){
-            return handleNumeric(value)
+            return value
             
         }else if(isString(value)){
             return value
@@ -96,6 +106,30 @@ export const useUtils = () => {
             return value[0]
 
         }
+    }
+
+    const contrastHandler = function (inputColour: string) {
+        if(!inputColour) return '#303030'
+
+        let backgroundColour :string = inputColour;
+        if(backgroundColour.includes('rgb')) {
+            backgroundColour = d3.color(inputColour)!.formatHex() // ! - Non-null Assertion Operator
+        }
+          // Get background color hex value. '#' is optional.
+          let hex = (backgroundColour.charAt(0) === '#') ? backgroundColour.substring(1, 7) : backgroundColour;
+          // Convert 3-digit hex to 6-digits.
+          if (hex.length === 3) {
+            hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+          }
+          // By this point, it should be 6 characters
+          if (hex.length !== 6) {
+            throw new Error('Invalid HEX color.');
+          }
+          let r = parseInt(hex.slice(0, 2), 16),
+              g = parseInt(hex.slice(2, 4), 16),
+              b = parseInt(hex.slice(4, 6), 16);
+          // Return light or dark class based on contrast calculation
+          return ((r * 0.299 + g * 0.587 + b * 0.114) > 150) ? '#303030' : '#ffffff';
     }
 
     //Clamp Function
@@ -149,9 +183,11 @@ export const useUtils = () => {
         clamp,
         longestNumberString,
         handleObjectPath,
+        handleObjectProperty,
         handleValue,
         handleArray,
         handleColourValue,
+        contrastHandler,
         coerceNumber,
         isNumber,
         isString,

@@ -4,13 +4,6 @@
         <div class="shelf-separator-container"><div class="shelf-separator"></div></div>
         <ViewDesigner />
         <div class="shelf-separator-container"><div class="shelf-separator"></div></div>
-        <div class="library-display-button-wrapper">
-            <button class="shelf-button" @click="libraryItemDisplay('agents')" >Agents</button>
-
-            <button class="shelf-button" @click="libraryItemDisplay('books')" >Books</button>
-
-            <button class="shelf-button" @click="libraryItemDisplay('marks')" >Marks</button>
-        </div>
         <LibraryView />
         <button ref="toTopButton" @click="scrollToTop" class="to-top-button">☝️</button>
     </div>
@@ -20,8 +13,6 @@
     import { storeToRefs } from "pinia";
    
     // STATE MANAGERS IMPORT //    
-    //Library State
-    const libraryStore = useLibraryStore();
 
     //View State
     const viewStore = useViewStore();
@@ -34,7 +25,8 @@
             viewColourSet } = storeToRefs(viewStore)
     const { parseDatabase,
             handleViewSelection,
-            getIDP } = useViewStore();
+            getIDP,
+            itemTypeCheck } = useViewStore();
         
     //Your Shelf State
     const yourShelfStore = useYourShelfStore();
@@ -66,11 +58,6 @@
     // TEST FUNCTION CALL  //
     // testFunction(parsedData.value, 'colour')
         
-    //Item Selection
-    function libraryItemDisplay(itemType){
-        parseDatabase(libraryStore[itemType])
-    }
-
 
 
     // To Top Button

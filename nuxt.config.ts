@@ -35,9 +35,9 @@ export default defineNuxtConfig({
     families: {
       // a name with spaces
       Roboto: true,
-      'Source Sans 3': [100,200,300,350,400,500,600,700],
-      'Source Serif 4': [100,200,300,350,400,500,600,700],
-      Raleway: [100,200,300,350,400,500,600,700],
+      'Source Sans 3': [100,150,200,250,300,350,400,450,500,550,600,650,700],
+      'Source Serif 4': [100,150,200,250,300,350,400,450,500,550,600,650,700],
+      Raleway: [100,150,200,250,300,350,400,450,500,550,600,650,700],
       // specific font weights
       // Lato: [100, 300],
     }

@@ -2,12 +2,12 @@
     <div>
         <h1 class="library-title">The Library of Libraries</h1>
     </div>
-    <div class="shelf" v-for="shelf in formattedLibrary">
+    <div class="shelf" v-for="shelf in formattedLibrary" :key="shelf">
         <div class="shelf-title-box">
             <h2 class="shelf-title">{{shelf[0]}}</h2>
         </div>
         <div class="shelf-inner">
-            <div class="section-wrapper" v-for="bookend in shelf[1]" >
+            <div class="section-wrapper" v-for="bookend in shelf[1]" :key="bookend" >
                 <div class="section-title-box" :style="{ height: scales.maxShelfHeight + 'px'}">
                     <h3 class="section-category">{{ categoryMap.get(libraryDisplay.viewType.bookend)[libraryDisplay.view.bookend] }}</h3>
                     <h3 class="section-value">{{ bookend[0] }}</h3>
@@ -15,8 +15,10 @@
                     <!-- Shelf Box DO NOT DELETE -->
                     </div>
                 </div>
-                    <div class="section-inner" v-for="item in bookend[1]" :style="{ height: scales.maxShelfHeight + 'px'}">
-                        <ItemView :item="item" :itemBundle="libraryItemBundle"/>
+                    <div class="section-inner" v-for="item in bookend[1]" :key="JSON.stringify(item)" :style="{ height: scales.maxShelfHeight + 'px'}">
+                        <AgentItem v-if="itemTypeCheck(item) === 'Agent'" :item="item" :itemBundle="libraryItemBundle.agents"/>
+                        <BookItem v-if="itemTypeCheck(item) === 'Book'" :item="item" :itemBundle="libraryItemBundle.books"/>
+                        <MarkItem v-if="itemTypeCheck(item) === 'Mark'" :item="item" :itemBundle="libraryItemBundle.marks"/>
                     </div>
             </div>
         </div>
@@ -38,7 +40,8 @@
             viewColourSet } = storeToRefs(viewStore)
     const { parseDatabase,
             handleViewSelection,
-            getIDP } = useViewStore();
+            getIDP,
+            itemTypeCheck } = useViewStore();
         
     //Your Shelf State
     const yourShelfStore = useYourShelfStore();
@@ -50,25 +53,9 @@
     const referenceStore = useReferenceStore();
     const { categoryMap, 
             invCategoryMap, 
-            scales } = storeToRefs(referenceStore)
+            scales,
+            libraryItemBundle } = storeToRefs(referenceStore)
 
-
-    //Objects passed to Components 
-    const libraryItemBundle = computed (() => {
-        return {
-            yourShelfFunction: addToShelf,
-            yourShelfText: 'Add to Shelf',
-            labelViewMode: 'label'
-        }
-    })
-
-    const yourShelfItemBundle = computed (() => {
-        return {
-            yourShelfFunction: removeFromShelf,
-            yourShelfText: 'Remove from Shelf',
-            labelViewMode: 'label'
-        }
-    })
 
 
     //Kept due to temporary use in template.

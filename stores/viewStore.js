@@ -1,7 +1,7 @@
 import * as d3 from "d3";
 
 export const useViewStore = defineStore('view', ()=>{
-    const { scales } = useReferenceStore();
+    const { colourMap, colourMapFiltered, scales } = useReferenceStore();
     const { handleNumeric,
             handleObjectPath,
             handleValue,
@@ -19,8 +19,22 @@ export const useViewStore = defineStore('view', ()=>{
     const formattedLibrary = ref([])
     
     //Set-up objects which can be checked for display using 'include' 
-    const viewCategory = {
-        ordinal: ['Size', 'Place of publication']
+    const colourCategory = {
+        // 'Size': schemePaired,
+        // 'Place of publication': schemePaired,
+        // 'Print or manuscript': ,
+        // 'STC or Wing'schemeDark2
+
+        // schemePaired: ['Size', 'Place of publication'],
+        // schemeDark2: ['Print or manuscript','STC or Wing'],
+        // schemeDark2: ['Print or manuscript','STC or Wing'],
+
+    }
+
+    const heightCategory = {
+        logarithmic: ['Number of marks', 'Number of book images', 'Size'],
+        year: ['Date of publication', 'Female agent date']
+
     }
 
     // LIBRARY VIEW OBJECT//
@@ -41,10 +55,15 @@ export const useViewStore = defineStore('view', ()=>{
             useColour: true,
             label: 'Title',
             useLabel: true,
-            menuSubHeader: 'Shelfmark',
-            subMenuCategory1: 'Author',
-            subMenuCategory2: 'Genre/Identity',
-            subMenuCategory3: 'Marginal Marks', //Need to add counter options here
+            agentLabel: 'Female agent name',
+            bookLabel: 'Title',
+            markLabel: 'Transcription',
+            agentCollectionProp1: 'Mark type (Mark of?)',
+            agentCollectionProp2: 'Genre/Identity',
+            bookCollectionProp1: 'Female agent name',
+            bookCollectionProp2: 'Number of marks',
+            markCollectionProp1: 'Female agent name',
+            markCollectionProp2: 'Title',
         },
         viewType: {
             id: 'Book',
@@ -53,10 +72,15 @@ export const useViewStore = defineStore('view', ()=>{
             height: 'Book',
             colour: 'Book',
             label: 'Book',
-            menuSubHeader: 'Book',
-            subMenuCategory1: 'Book',
-            subMenuCategory2: 'Book',
-            subMenuCategory3: 'Book',
+            agentLabel: 'Agent',
+            bookLabel: 'Book',
+            markLabel: 'Mark',
+            agentCollectionProp1: 'Mark',
+            agentCollectionProp2: 'Book',
+            bookCollectionProp1: 'Agent',
+            bookCollectionProp2: 'Book',
+            markCollectionProp1: 'Agent',
+            markCollectionProp2: 'Book',
         },
         AgentLookUp: {
             Agent: '',
@@ -139,44 +163,91 @@ export const useViewStore = defineStore('view', ()=>{
 
     // HANDLE HEIGHT //
     function formatHeight(data, view) {
-        return d3.scaleLinear()
-                    .domain(chooseHeightDomain(data)) 
-                    .unknown(scales.maxItemHeight) //Set all non-numeric values to max height
-                    .range([scales.minItemHeight, scales.maxItemHeight])
-                    .clamp(true);     
+        const viewSelection = libraryDisplay.view.height
+        console.log('heightCategory', heightCategory.logarithmic.includes(viewSelection))
+        //Returns a function which takes the log scale of the input then invokes the d3 scale function (IIFE)
+        if(heightCategory.logarithmic.includes(viewSelection)){
+            return (value)=>{ 
+                return (d3.scaleLinear()
+                            .domain(chooseHeightDomain(data).map(d => Math.log(d))) 
+                            .unknown(scales.maxItemHeight) //Set all non-numeric values to max height
+                            .range([scales.minItemHeight, scales.maxItemHeight])
+                            .clamp(true)
+                        )(Math.log(value)); 
+            }
+        }else{
+            return d3.scaleLinear()
+                        .domain(chooseHeightDomain(data)) 
+                        .unknown(scales.maxItemHeight) //Set all non-numeric values to max height
+                        .range([scales.minItemHeight, scales.maxItemHeight])
+                        .clamp(true);     
+        }
     }
     
     function chooseHeightDomain(data){   
             const viewSelection = libraryDisplay.view.height
-            if(viewSelection.toLowerCase().includes('date')) {
+            const domainIndex = getDomainIndex.value
+            if(heightCategory.year.includes(viewSelection)) {
                 return [1450, 1750] //was - clamp(1450, longestNumber, 1750)
             }else{
-                const domainIndex = getDomainIndex.value
                 return [getIDP(data[domainIndex.min], 'height'), getIDP(data[domainIndex.max], 'height')]
             }
     }
 
     // HANDLE COLOUR //
     function formatColour(data, view){
-        if(data.some(d => isNumber(getIDP(d, 'colour')))){
-            console.log('Colour Continuous')
-            return d3.scaleLinear()
-                        .domain(d3
-                            .extent(data
-                            .filter(d => getIDP(d, 'colour'))
-                            .map(d => {
-                                return getIDP(d, 'colour')})))
-                        .range(['royalblue', 'pink'])
-                        .clamp(true)
-        }
+        const viewMode = 'colour'
+        const viewSelection = libraryDisplay.view[viewMode]
+        const viewModeType = libraryDisplay.viewType[viewMode]
+
+        console.log(viewModeType, viewSelection, viewMode)
+
+        const colourFunction = colourMap.get(viewModeType)[viewSelection].func
+        const colourScheme = colourMap.get(viewModeType)[viewSelection].scheme
+        const useLen = colourMap.get(viewModeType)[viewSelection].useLen
+        // if(data.some(d => isNumber(getIDP(d, 'colour')))){
+        //     console.log('Colour Continuous')
+        //     return d3.scaleLinear()
+        //                 .domain(d3
+        //                     .extent(data
+        //                     .filter(d => getIDP(d, 'colour'))
+        //                     .map(d => {
+        //                         return getIDP(d, 'colour')})))
+        //                 .range(['royalblue', 'pink'])
+        //                 .clamp(true)
+        // }
+        const colourScale = colourBandscale(processColourSet(data))
         console.log('Colour Ordinal')
-        return d3.scaleOrdinal(d3.schemeSet3)
-                    .domain(data.map((d) => {
-                    return getIDP(d, 'colour')})) 
+        if(true){
+             const colourFunc = d3[colourFunction](d3[colourScheme]) //Domain defaults to [0,1]
+            return (
+                (value) => colourFunc(colourScale(value)) //Returns nested scale function after applying band function
+            )
+        }
+        else{
+            return (value) => {
+                return (d3[colourFunction](d3[colourScheme])
+                    .domain([0, Math.log(1000)]))(Math.log(value))
+            }
         }
 
+        
+
+
+                    //len = viewColourSet.length
+    }
+
+    function colourBandscale(colourSet){
+        console.log('Array.from colourSet',Array.from(colourSet))
+        return d3.scaleBand()
+                    .domain(Array.from(colourSet)) //Range defaults to [0,1]
+    }
+
     function processColourSet(data){
-        return new Set(data.flatMap(d => getIDP(d, 'colour')))
+        // console.log('flatMap', data.flatMap(d=> getIDP(d, 'colour')))
+        // console.log('sort',data.flatMap(d=> getIDP(d, 'colour')).sort(alphabetically(true)))
+        // console.log('sorted set',  new Set(data.flatMap(d=> getIDP(d, 'colour')).sort(alphabetically(true))))
+       return new Set(data.flatMap(d=> getIDP(d, 'colour')).sort(alphabetically(true)))
     }
 
     function processColourItems(data, colourSet){
@@ -189,8 +260,10 @@ export const useViewStore = defineStore('view', ()=>{
                 return false
             }
         })
-        console.log(uniqueColours)
-        return uniqueColours
+        // console.log('unique colours', new Set(uniqueColours.sort((a, b) => alphabetically(true)(getIDP(a, 'colour'), getIDP(b, 'colour')))))
+
+
+        return  new Set(uniqueColours.sort((a, b) => alphabetically(true)(getIDP(a, 'colour'), getIDP(b, 'colour'))))
     }
 
     // EXTERNAL FUNCTIONS //
@@ -214,43 +287,78 @@ export const useViewStore = defineStore('view', ()=>{
         if(!item) return null
         const viewSelection = libraryDisplay.view[viewMode]
         const viewModeType = libraryDisplay.viewType[viewMode]
-        const itemType = item['FemaleAgentID'] ? 'Agent' :
-                         item['BookID'] ? 'Book' :
-                         item['MargID'] ? 'Mark' : ''
+        const itemType = itemTypeCheck(item)
 
         // console.log('item',item)
         // console.log('hasOwnProperty: Marks', item.hasOwnProperty('Marks'))
         // console.log('Length: Marks', item['Books'].length)
         // console.log('item type', itemType, 'viewSelection', viewSelection, 'viewModeType', viewModeType)
-        //Agent Item paths
-        if(itemType === 'Agent' && viewModeType === 'Agent') value = handleObjectPath(item, viewMode, viewSelection)
-        if(itemType === 'Agent' && viewModeType === 'Mark') value = handleObjectPath(item, viewMode, 'Marks', 0, viewSelection)
-        if(itemType === 'Agent' && viewModeType === 'Book') value = handleObjectPath(item, viewMode, 'Marks', 0, 'Books', viewSelection)
-        //Book Item paths                 
-        if(itemType === 'Book' && viewModeType === 'Book') value = handleObjectPath(item, viewMode, viewSelection)
-        if(itemType === 'Book' && viewModeType === 'Mark') value = handleObjectPath(item, viewMode,'Marks',0,viewSelection)
-        if(itemType === 'Book' && viewModeType === 'Agent') value = handleObjectPath(item, viewMode, 'Marks', 0, 'Agents', viewSelection)
-        //Mark Item paths
-        if(itemType === 'Mark' && viewModeType === 'Mark') value = handleObjectPath(item, viewMode, viewSelection)
-        if(itemType === 'Mark' && viewModeType === 'Agent') value = handleObjectPath(item, viewMode, 'Agents', viewSelection) 
-        if(itemType === 'Mark' && viewModeType === 'Book') value = handleObjectPath(item, viewMode, 'Books', viewSelection)
-
-        return value ? value : "no data"
+        if(itemType === 'Agent'){
+            //Agent Item paths
+            if(viewModeType === 'Agent') value = handleObjectPath(item, viewMode, viewSelection)
+            if(viewModeType === 'Mark') value = handleObjectPath(item, viewMode, 'Marks', 0, viewSelection)
+            if(viewModeType === 'Book') value = handleObjectPath(item, viewMode, 'Marks', 0, 'Books', viewSelection)
+        }else if(itemType === 'Book'){
+            //Book Item paths                 
+            if(viewModeType === 'Book') value = handleObjectPath(item, viewMode, viewSelection)
+            if(viewModeType === 'Mark') value = handleObjectPath(item, viewMode,'Marks',0,viewSelection)
+            if(viewModeType === 'Agent') value = handleObjectPath(item, viewMode, 'Marks', 0, 'Agents', viewSelection)
+        }else if(itemType === 'Mark'){
+            //Mark Item paths
+            if(viewModeType === 'Mark') value = handleObjectPath(item, viewMode, viewSelection)
+            if(viewModeType === 'Agent') value = handleObjectPath(item, viewMode, 'Agents', viewSelection) 
+            if(viewModeType === 'Book') value = handleObjectPath(item, viewMode, 'Books', viewSelection)
+        }
+            return value ? value : "no data"
         
         //Add editor for No Value - return "No Data"
         // var [marks, markIndex, agent]  = libraryDisplay.BookLookUp[libraryDisplay.viewType[viewMode]].split(',')
         //     return item[marks][markIndex][agent]
     }
 
+    function itemTypeCheck(item){
+        return  item['FemaleAgentID'] ? 'Agent' :
+                item['BookID'] ? 'Book' :
+                item['MargID'] ? 'Mark' : ''
+    }
+
+    function alphabetically(ascending) {
+        return function (a, b) {
+          // equal items sort equally
+          if (a === b) {
+              return 0;
+          }
+      
+          // nulls sort after anything else
+          if (a === 'no data') {
+              return 1;
+          }
+          if (b === 'no data') {
+              return -1;
+          }
+      
+          // otherwise, if we're ascending, lowest sorts first
+          if (ascending) {
+              return a < b ? -1 : 1;
+          }
+      
+          // if descending, highest sorts first
+          return a < b ? 1 : -1;
+        };
+      }
+
 
       return {  libraryData,
                 libraryDisplay,
                 formattedLibrary, 
+                colourCategory,
+                heightCategory,
                 itemHeight,
                 itemColour, 
                 viewHeightBounds, 
                 viewColourSet,
                 parseDatabase,
                 handleViewSelection,
-                getIDP  }
+                getIDP,
+                itemTypeCheck  }
   })

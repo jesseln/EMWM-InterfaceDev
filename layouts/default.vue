@@ -23,6 +23,9 @@
   const libraryStore = useLibraryStore();
   const yourShelfStore = useYourShelfStore();
   const { parseDatabase } = useViewStore();
+
+  // COMPOPSABLES
+  const { updateCalulatedColumn } = useDatabase();
   
   libraryStore.getAgents();
   libraryStore.getBooks();
@@ -32,7 +35,6 @@
     parseDatabase(libraryStore.books)
     // parseDatabase(libraryStore.marks)
   })
-  
 
   </script>
   
