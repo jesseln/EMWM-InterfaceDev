@@ -13,7 +13,7 @@
             width:scales.minItemWidth - 2 + 'px'}" :class="{lowlight: isHighlight}">
 
 
-<div class="item-value" :style="{ color: '#303030'}">
+<div class="item-value" :style="{ color: contrastHandler(itemColour(getIDP(item, 'colour')))}">
             <p >{{ getIDP(item, itemBundle.labelViewMode) }}</p>
         </div>
         </div>
