@@ -24,9 +24,8 @@ export default defineNuxtConfig({
     presets: {
       bookImage: {
         modifiers: {
-          format: 'jpg',
           width: 200,
-          height: 200
+          height: 200,
         }
       }
     }
@@ -54,6 +53,10 @@ export default defineNuxtConfig({
         {
           rel: 'stylesheet',
           href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" 
+        },
+        {
+            rel: 'stylesheet',
+            href: 'https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css' 
         },
         // {
         //   rel: 'stylesheet',

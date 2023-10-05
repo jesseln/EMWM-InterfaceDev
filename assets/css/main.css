@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto:300,400,500");
+
 * {
 	box-sizing: border-box; 
 	margin: 0;
@@ -93,20 +95,65 @@ body {
 
 .main-navbar{
 	grid-area: navbar;
-	padding: 1rem 0 1rem 0;
+	padding: 1rem 0 0.5rem 0;
 	margin: 1rem var(--sideMargins);
-	display: grid;
+	display: flex;
+    flex-direction: row;
 	border-bottom: 2px solid;
 }
 
+
+
 .main-navbar-link{
 	text-decoration: none;
-	margin: 0 10px;
+	margin: 0px;
 	color: black;
 	font-family: Raleway, sans-serif;
 	font-size: 1rem;
 	font-weight:500;
 }  
+
+.nav-active .main-navbar-link{
+    font-weight:650;
+}
+.dropbtn {
+    padding: 0.8rem 1.25rem;
+    font-size: 16px;
+    border: none;
+  }
+
+.dropdown {
+    /* position: relative;
+    display: inline-block; */
+  }
+  
+  .dropdown-content {
+    display: block;
+    visibility: hidden;
+    position: absolute;
+    left: 0;
+    top: 11rem;
+    background-color: #ffffff;
+    min-width: 100vw;
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 3px 12px 0px;
+    z-index: 1;
+    transition-delay: .3s;
+  }
+  
+  /* .dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  } */
+
+  .dropdown-content a:hover {background-color: #ddd;}
+
+ .dropdown:hover .dropdown-content {
+    visibility: visible;
+    transition-delay: .1s;}
+
+ .dropdown:hover .dropbtn {background-color: #f1f1f1;}
 
 /* .home-header{
 
@@ -663,8 +710,10 @@ body {
 	padding: 0.5rem 0 0;
 	max-height: 50rem;
 	width: 100%;
+    border-radius: 100px;
  }
  
+
 
  body::-webkit-scrollbar {
     width: 0.9rem;               /* width of the entire scrollbar */
@@ -904,6 +953,39 @@ body {
 	z-index: 2;
   }
 
+  .annotation-button {
+	border-radius: 50%;
+	height: 3rem;
+	width: 3rem;
+	padding: 4px;
+	box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+	cursor: pointer;
+	position: fixed;
+	bottom: 7vw;
+	display: block;
+	right: 3.5vw;
+	background-color: rgb(255, 255, 255);
+	border: none;
+	border-radius: 50%;
+	color: black;
+	cursor: pointer;
+	font-size: 16px;
+	line-height: 48px;
+	z-index: 20;
+  }
+
+  .annotation-button.active{
+    background-color: #fff281;
+  }
+
+
+  .annotation-button:hover{
+    background-color: #fff281;
+  }
+
+  .annotation-button.active:hover {
+    background-color: #ffffff;
+  }
 
   .shelf-button p{
 	display: inline;
@@ -1006,5 +1088,11 @@ body {
 	justify-content: center;
 	/* cursor: pointer; */
   }
+
+  
+
+  /* 
+  FROM VUE DRAW
+  */
 
   

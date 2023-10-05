@@ -15,7 +15,7 @@
         </div>
         </div>
     </div>
-        <template #popper>
+        <template #popper >
             <div class="item-menu-container scrollable">
             <div class="item-menu-header-container">
                 <h2 class="item-menu-header">{{ itemBundle.menuHeader }}</h2>
@@ -31,6 +31,25 @@
                     <button class="shelf-button" @click="itemBundle.yourShelfFunction(item)">{{itemBundle.yourShelfText}}</button>
                 </div>
                 <ul>
+                    <li>
+                        <vueper-slides :dragging-distance="70" prevent-y-scroll lazy lazy-load-on-drag>
+                            <vueper-slide
+                                v-for="i in 5"
+                                :key="i"
+                                image="https://hmgugjmjfcvjtmrrafjm.supabase.co/storage/v1/object/public/book-images/10/BookID_10_(1_of_6).jpg"
+                                title="slide.title"
+                                content="slide.content" />
+                        </vueper-slides>
+                        <!-- <div v-if="booksTest">
+                            <div v-for="book in booksTest">
+                                <NuxtImg   
+                                loading="lazy"
+                                height="50"
+                                quality="50"
+                                :src="`https://hmgugjmjfcvjtmrrafjm.supabase.co/storage/v1/object/public/book-images/${item.BookID}/${book.name}`" />
+                            </div>
+                        </div> -->
+                    </li>
                     <li>
                         <h4>{{ categoryMap.get(itemBundle.itemType)[itemBundle.ownProp1]}}</h4>
                         <p>{{ handleObjectProperty(item, itemBundle.ownProp1) }}</p>
@@ -87,6 +106,8 @@
                         <h3>{{ getIDP(item, itemBundle.viewProp4) }}</h3>
                     </li>
                 </ul>
+
+                
             </div>
             </div>
         </div>
@@ -104,11 +125,13 @@ import * as d3 from "d3";
 import FloatingVue from 'floating-vue'
 import 'floating-vue/dist/style.css'
 import { storeToRefs } from "pinia";
+import { VueperSlides, VueperSlide } from 'vueperslides'
+import 'vueperslides/dist/vueperslides.css'
 
 
+const supabase = useSupabaseClient()
 //Props
 const {item, itemBundle} = defineProps(['item', 'itemBundle']);
-
 // STATE MANAGERS IMPORT //    
 //View State
 const viewStore = useViewStore();
@@ -151,6 +174,39 @@ const itemHandlers = {
   mouseover: handleMouseOver,
   mouseout: handleMouseOut
 }
+
+const bookSlides = ref(
+    { 
+        image: "",
+        title: "my title",
+        content: "my content",
+    }
+)
+
+async function bookImages(item){
+    const { data, error } = await supabase
+    .storage
+    // .listBuckets()
+    .from('book-images')
+    // .list('10')
+    .list(`${item.BookID}`, {
+        limit: 100,
+        offset: 0,
+        sortBy: { column: 'name', order: 'asc' },
+    })
+    if(error) {
+            console.log(error)
+    }
+
+    if(data){
+        bookSlides.value.image = data
+        return data
+    }
+}
+
+onMounted(()=>{
+    bookImages(item)
+})
 
 function handleMouseOver(d) {
     d3.select(d.currentTarget)

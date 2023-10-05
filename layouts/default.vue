@@ -1,15 +1,37 @@
 <template>
     <div class="site-wrapper">
       
-      <header class="site-header">
+    <header class="site-header">
+    <NuxtLink to="/">
         <div class="site-header-title-wrapper">
           <h1 class="site-header-title">The Library of Libraries</h1>
           <p class="site-header-subtitle">Early Modern Women's Marginalia</p>
         </div>
-      </header>
+    </NuxtLink>
+    </header>
       <div class="main-navbar">
-          <NuxtLink to="/" >
-            <h2 class=main-navbar-link>The Library of Libraries</h2>
+          <NuxtLink to="/library-of-libraries" activeClass="nav-active">
+            <div class="dropdown">
+            <h2 class="main-navbar-link dropbtn">Explore the Libraries</h2>
+                <div class="dropdown-content">
+                    <LibraryMenu />
+                </div>
+            </div>
+          </NuxtLink>
+          <NuxtLink to="/your-collection" activeClass="nav-active">
+            <div class="dropdown">
+                <h2 class="main-navbar-link dropbtn" >View Your Collection</h2>
+            </div>   
+          </NuxtLink>
+          <NuxtLink to="/shared-annotations" activeClass="nav-active">
+            <div class="dropdown">
+                <h2 class="main-navbar-link dropbtn" >Find Annotations</h2>
+            </div>   
+          </NuxtLink>
+          <NuxtLink to="/about" activeClass="nav-active">
+            <div class="dropdown">
+                <h2 class="main-navbar-link dropbtn" >Read About the Collection</h2>
+            </div>   
           </NuxtLink>
       </div>
       <div class="library-slot">
@@ -27,18 +49,21 @@
   // COMPOPSABLES
   const { updateCalulatedColumn } = useDatabase();
   
-  libraryStore.getAgents();
-  libraryStore.getBooks();
-  libraryStore.getMarks();
+//   libraryStore.getAgents();
+//   libraryStore.getBooks();
+//   libraryStore.getMarks();
   watchEffect(()=>{
     // parseDatabase(libraryStore.agents)
-    parseDatabase(libraryStore.books)
+    // parseDatabase(libraryStore.books)
     // parseDatabase(libraryStore.marks)
   })
 
   </script>
   
   <style scoped>
+
+
+
     .badge{
       position: relative;
       left: -15px;

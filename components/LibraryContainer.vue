@@ -1,10 +1,10 @@
 <template>
     <div class="library-wrapper">
-        <YourShelf />
+        <!-- <YourShelf /> -->
         <div class="shelf-separator-container"><div class="shelf-separator"></div></div>
-        <ViewDesigner />
+        <!-- <ViewDesigner /> -->
         <div class="shelf-separator-container"><div class="shelf-separator"></div></div>
-        <LibraryView />
+        <!-- <LibraryView /> -->
         <button ref="toTopButton" @click="scrollToTop" class="to-top-button">☝️</button>
     </div>
 </template>
@@ -61,22 +61,19 @@
 
 
     // To Top Button
+    const { x, y } = useWindowScroll() // To replace below
+    const useX = x
+    const useY = y
     const toTopButton = ref();
-    const userScroll = () => {
-      if (window.scrollY > 550) {
-        toTopButton.value.classList.add("showButton");
-        console.log('scrolled');
-      } else {
-        toTopButton.value.classList.remove("showButton");
-        console.log('top');
-      }
-    };
     onMounted(() => {
-      window.addEventListener("scroll", userScroll);
-    });
-    onBeforeMount(() => {
-      window.removeEventListener("scroll", userScroll);
-    });
+        watchEffect(()=>{
+            if (useY.value > 550) {
+                toTopButton.value.classList.add("showButton");
+            } else {
+                toTopButton.value.classList.remove("showButton");
+            }
+        })
+    })
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };

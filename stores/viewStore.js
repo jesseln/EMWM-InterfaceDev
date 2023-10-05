@@ -115,7 +115,7 @@ export const useViewStore = defineStore('view', ()=>{
     // EXTERNAL GETTERS //
     //Library Structure
     watch([libraryData.value, libraryDisplay],() => {
-        formattedLibrary.value =  formatLibrary(libraryData.value, libraryDisplay);
+        // formattedLibrary.value =  formatLibrary(libraryData.value, libraryDisplay); //Reactive when not testing
     })
     //Item Height - Returns d3 Scale Function
     const itemHeight =  computed (() => {
